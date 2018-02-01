@@ -23,7 +23,7 @@ class TestMain(unittest.TestCase):
         self.assertEqual("that@13", token_df.at['that', 'summary'])
         self.assertEqual("the|The@11", token_df.at['the', 'summary'])
         self.assertEqual("we|We@10", token_df.at['we', 'summary'])
-        self.assertEqual("to|tO@8", token_df.at['to', 'summary'])
+        self.assertEqual("to|t0@8", token_df.at['to', 'summary'])
         self.assertEqual("here@8", token_df.at['here', 'summary'])
         self.assertEqual("a@7", token_df.at['a', 'summary'])
         self.assertEqual("and@6", token_df.at['and', 'summary'])
