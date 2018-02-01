@@ -17,6 +17,10 @@ def normalize(word):
 def compute_token_df(text):
     """ Return a dataframe describing tokens generated from text """
 
+    # NOTE: If text cannot fix in local memory, the caller of this function
+    # may break the text into chunks, call this function on each chunk, 
+    # and aggregate all token_df's into a final token_df
+
     # Split into words according to spec
     # NOTE: Added \n as delimiter even it is not mentioned in spec
     words = filter(None, re.split(r"[.,\- \n]+", text))
@@ -27,9 +31,13 @@ def compute_token_df(text):
     grouped = word_df.groupby('token')
     token_df = grouped.count()
     token_df.columns = ['freq']
-    vars_ser = grouped.apply(lambda df : '|'.join(df.word.unique())).rename('variations')
-    token_df = token_df.join(vars_ser)
-    token_df['summary'] = token_df.variations + '@' +  token_df.freq.astype(str)
+    variation_ser = grouped.apply(lambda df : df.word.unique().tolist()).rename('variation')
+    token_df = token_df.join(variation_ser)
+    summary_ser = (
+        token_df.variation.apply(lambda x : '|'.join(x))
+        + '@' + token_df.freq.astype(str)
+    ).rename('summary')
+    token_df = token_df.join(summary_ser)
 
     return token_df
 
@@ -44,4 +52,5 @@ if __name__ == "__main__":
     k = args.k
 
     token_df = compute_token_df(text)
+
     print '\n'.join(token_df.sort_values('freq', ascending=False).head(k)['summary'].values)
